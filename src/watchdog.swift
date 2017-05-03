@@ -87,9 +87,9 @@ extension Process {
   /// synchronously, and return the output, error output as well ass
   /// exit code.
   static func run(
-    command cmd: String
-          , withArguments args: String...
-          , termination: ( ( Process ) -> Void )? = nil ) -> 
+      command cmd: String
+    , withArguments args: String...
+    , termination: ( ( Process ) -> Void )? = nil ) -> 
     ( output: [ String ], error: [ String ], exitCode: Int32 ) {
 
     var output: [ String ] = []
