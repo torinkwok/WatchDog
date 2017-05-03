@@ -84,9 +84,13 @@ extension EnumCollection {
 
 extension Process {
 
-  enum StandardPipe { case input; case output; case error }
-
+  enum StandardPipe: EnumCollection { case input; case output; case error }
   typealias PipeDataResolver = () -> [ String ]
+
+  /// This method install a custom pipe for the specified standard I/O 
+  /// file and return a closure that directly resolves the installed
+  /// pipe's data as an array of `String`, without having to deal with 
+  /// `Pipe`s' `fileHandleForReading` method and `FileHandle` class.
   func installPipe( for piptype: StandardPipe ) -> PipeDataResolver {
 
     let pip = Pipe()
@@ -131,7 +135,11 @@ extension Process {
       }
 
     subProcess.waitUntilExit()
-    return ( outPipeResolver(), errPipeResolver(), subProcess.terminationStatus )
+    return 
+      ( outPipeResolver()
+      , errPipeResolver()
+      , subProcess.terminationStatus 
+      )
     }
   }
 
