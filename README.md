@@ -17,3 +17,6 @@ Incompatible Kernel Ext. 18 Dec 2016, 8:54 AM     12.5.0
 Chinese Word List        13 Otc 2014  8:22 PM     4.22
 Core LSKD (dkrl)         18 Feb 2017, 6:17 AM     8  
 ```
+
+# Author
+Torin Kwok.
