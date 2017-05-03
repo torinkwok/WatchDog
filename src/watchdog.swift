@@ -149,10 +149,10 @@ extension Process {
 /// A bunch of security update items we're going to examine.
 enum macOSCriticalUpdateItems: String, EnumCollection {
 
-  case XProtect = "XProtect"
-  case Gatekeeper = "Gatekeeper"
-  case SIP = "SIP"
-  case MRT = "MRT"
+  case XProtect
+  case Gatekeeper
+  case SIP
+  case MRT
   case CoreSuggestions = "Core Suggestions"
   case IncompatibleKernelExt = "Incompatible Kernel Ext."
   case ChineseWordList = "Chinese Word List"
