@@ -83,6 +83,31 @@ extension EnumCollection {
   }
 
 extension Process {
+
+  enum StandardPipe { case input; case output; case error }
+
+  typealias PipeDataResolver = () -> [ String ]
+  func installPipe( for piptype: StandardPipe ) -> PipeDataResolver {
+
+    let pip = Pipe()
+    switch piptype {
+      case .input: self.standardInput = pip
+      case .output: self.standardOutput = pip
+      case .error: self.standardError = pip
+      }
+
+    return {
+      let outData = pip.fileHandleForReading.readDataToEndOfFile()
+
+      guard var stringlized = String( data: outData, encoding: .utf8 ) else {
+        return []
+        }
+
+      stringlized = stringlized.trimmingCharacters( in: NSCharacterSet.newlines )
+      return stringlized.components( separatedBy: "\n" )
+      }
+    }
+
   /// This is a simple utility function to run an external command
   /// synchronously, and return the output, error output as well ass
   /// exit code.
@@ -92,39 +117,21 @@ extension Process {
     , termination: ( ( Process ) -> Void )? = nil ) -> 
     ( output: [ String ], error: [ String ], exitCode: Int32 ) {
 
-    var output: [ String ] = []
-    var error: [ String ] = []
-
     let subProcess = Process()
     subProcess.launchPath = cmd
     subProcess.arguments = args
 
-    let outPipe = Pipe()
-    subProcess.standardOutput = outPipe
-
-    let errPipe = Pipe()
-    subProcess.standardError = errPipe
+    let outPipeResolver = subProcess.installPipe( for: .output )
+    let errPipeResolver = subProcess.installPipe( for: .error )
 
     subProcess.launch()
-
-    let outData = outPipe.fileHandleForReading.readDataToEndOfFile()
-    if var stringlized = String( data: outData, encoding: .utf8 ) {
-      stringlized = stringlized.trimmingCharacters( in: NSCharacterSet.newlines )
-      output = stringlized.components( separatedBy: "\n" )
-      }
-
-    let errData = errPipe.fileHandleForReading.readDataToEndOfFile()
-    if var stringlized = String( data: errData, encoding: .utf8 ) {
-      stringlized = stringlized.trimmingCharacters( in: NSCharacterSet.newlines )
-      error = stringlized.components( separatedBy: "\n" )
-      }
 
     if let terminationHandler = termination {
       subProcess.terminationHandler = terminationHandler
       }
 
     subProcess.waitUntilExit()
-    return ( output, error, subProcess.terminationStatus )
+    return ( outPipeResolver(), errPipeResolver(), subProcess.terminationStatus )
     }
   }
 
