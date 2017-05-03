@@ -2,7 +2,7 @@
 
 ### What's this?
 
-[GateKeeper](https://en.wikipedia.org/wiki/Gatekeeper_(macOS)), [MRT (Malware Removal Tool)](https://support.apple.com/kb/PH25087?locale=en_US), and [XProtect](https://www.howtogeek.com/217043/xprotect-explained-how-your-macs-built-in-anti-malware-works/) are all built-in features of Mac OS designed to prevent malware threats and other nefarious software from being installed or used on a Mac. These security features exist in the background and are updated with regular system software updates to Mac OS, but Apple will also push quiet updates to xprotect or MRT to add new definitions and block newfound threats.
+[GateKeeper](https://en.wikipedia.org/wiki/Gatekeeper_(macOS)), [MRT (Malware Removal Tool)](https://support.apple.com/kb/PH25087?locale=en_US), and [XProtect](https://www.howtogeek.com/217043/xprotect-explained-how-your-macs-built-in-anti-malware-works/) are all built-in features of macOS designed to prevent malware threats and other nefarious software from being installed or used on a Mac. These security features exist in the background and are updated with regular system software updates to macOS, but Apple will also push quiet updates to xprotect or MRT to add new definitions and block newfound threats.
 
 Advanced users may wish to know what versions of those security tools is installed on a Mac. *WatchDog* is a lovely script written for that.
 
