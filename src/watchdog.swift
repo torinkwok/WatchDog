@@ -133,7 +133,7 @@ extension Process {
 //////////////////////////////////////////////////////////////////////
 
 /// A bunch of security update items we're going to examine.
-enum macOSCriticalUpdateItems: String, EnumCollection {
+enum macOSCriticalUpdateItems: String, EnumCollection, CustomStringConvertible {
 
   case XProtect = "/System/Library/CoreServices/XProtect.bundle/Contents/Resources/XProtect.meta.plist"
   case Gatekeeper = "/private/var/db/gkopaque.bundle/Contents/version.plist"
@@ -143,6 +143,19 @@ enum macOSCriticalUpdateItems: String, EnumCollection {
   case IncompatibleKernelExt = "/System/Library/Extensions/AppleKextExcludeList.kext/Contents/version.plist"
   case ChineseWordList = "/usr/share/mecabra/updates/com.apple.inputmethod.SCIM.bundle/Contents/version.plist"
   case CoreLSDK = "/usr/share/kdrl.bundle/info.plist"
+
+  var description: String {
+    switch self {
+      case .XProtect             : return "XProtect"
+      case .Gatekeeper           : return "Gatekeeper"
+      case .SIP                  : return "SIP"
+      case .MRT                  : return "MRT"
+      case .CoreSuggestions      : return "Core Suggestions"
+      case .IncompatibleKernelExt: return "Incompatible Kernel Ext."
+      case .ChineseWordList      : return "Chinese Word List"
+      case .CoreLSDK             : return "Core LSKD (dkrl)"
+      }
+    }
 
   var keyInDefaultsSystem: String {
     switch self {
@@ -167,15 +180,37 @@ enum macOSCriticalUpdateItems: String, EnumCollection {
 //////////////////////////////////////////////////////////////////////
 
 do {
-  print( "Name", "Date", "Version", separator: String( repeating: " ", count: 10 ) )
-  print( String( repeating: "-", count: 42 ) )
+  let outputPrinter = { ( _ tuple: ( first: String, second: Any, third: String )? ) in
+    guard let tuple = tuple else {
+      print( String( repeating: "-", count: 57 ) )      
+      return
+      }
+
+    var dateString: String = ""
+
+    if let date = tuple.second as? Date {
+      let dateFormatter = DateFormatter()
+
+      dateFormatter.dateStyle = .medium
+      dateFormatter.timeStyle = .short
+
+      dateString = dateFormatter.string( from: date )
+      } else if let string = tuple.second as? String {
+        dateString = string
+        }
+
+    print(
+        tuple.first.padding( toLength: 24, withPad: " ", startingAt: 0 )
+      , dateString.padding( toLength: 24, withPad: " ", startingAt: 0 )
+      , tuple.third.padding( toLength: 12, withPad: " ", startingAt: 0 )
+      )
+    }
+
+  outputPrinter( ( first: "Name", second: "Date", third: "Version" ) )
+  outputPrinter( nil )
 
   for updateItem in macOSCriticalUpdateItems.allAlternatives() {
-    var versionNumber = "N/A"
-    var modifiedDate = "N/A"
-
     guard updateItem.exists else {
-      print( updateItem, modifiedDate, versionNumber )
       continue
       }
 
@@ -184,15 +219,14 @@ do {
       , withArguments: "read", updateItem.rawValue, updateItem.keyInDefaultsSystem 
       )
 
-    let fileAttributes = try? FileManager.default.attributesOfItem( atPath: updateItem.rawValue )
-    if let modDate = fileAttributes?[ .modificationDate ] as? Date {
-      modifiedDate = modDate.description
+    if let version = output.first
+      , let fileAttributes = try? FileManager.default.attributesOfItem( atPath: updateItem.rawValue )
+      , let modDate = fileAttributes[ .modificationDate ] as? Date {
+      outputPrinter( 
+        ( first: String( describing: updateItem )
+        , second: modDate
+        , third: version 
+        ) )
       }
-
-    if let version = output.first {
-      versionNumber = version
-      }
-
-    print( updateItem, modifiedDate, versionNumber )
     }
   }
