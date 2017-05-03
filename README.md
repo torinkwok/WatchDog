@@ -1,5 +1,7 @@
 # WatchDog [![travis-ci-status](https://travis-ci.org/TorinKwok/WatchDog.svg?branch=master)](https://travis-ci.org/TorinKwok/WatchDog) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](./LICENSE)
 
+### What's this?
+
 [GateKeeper](https://en.wikipedia.org/wiki/Gatekeeper_(macOS)), [MRT (Malware Removal Tool)](https://support.apple.com/kb/PH25087?locale=en_US), and [XProtect](https://www.howtogeek.com/217043/xprotect-explained-how-your-macs-built-in-anti-malware-works/) are all built-in features of Mac OS designed to prevent malware threats and other nefarious software from being installed or used on a Mac. These security features exist in the background and are updated with regular system software updates to Mac OS, but Apple will also push quiet updates to xprotect or MRT to add new definitions and block newfound threats.
 
 Advanced users may wish to know what versions of those security tools is installed on a Mac. *WatchDog* is a lovely script written for that.
@@ -18,5 +20,5 @@ Chinese Word List        13 Otc 2014  8:22 PM     4.22
 Core LSKD (dkrl)         18 Feb 2017, 6:17 AM     8  
 ```
 
-# Author
+### Author
 Torin Kwok.
