@@ -82,48 +82,50 @@ extension EnumCollection {
     }
   }
 
-/// This is a simple utility function to run an external command
-/// synchronously, and return the output, error output as well ass
-/// exit code.
-func run(
-  command cmd: String
-, withArguments args: String...
-, termination: ( ( Process ) -> Void )? = nil ) -> 
-  ( output: [ String ], error: [ String ], exitCode: Int32 ) {
+extension Process {
+  /// This is a simple utility function to run an external command
+  /// synchronously, and return the output, error output as well ass
+  /// exit code.
+  static func run(
+    command cmd: String
+          , withArguments args: String...
+          , termination: ( ( Process ) -> Void )? = nil ) -> 
+    ( output: [ String ], error: [ String ], exitCode: Int32 ) {
 
-  var output: [ String ] = []
-  var error: [ String ] = []
+    var output: [ String ] = []
+    var error: [ String ] = []
 
-  let subProcess = Process()
-  subProcess.launchPath = cmd
-  subProcess.arguments = args
+    let subProcess = Process()
+    subProcess.launchPath = cmd
+    subProcess.arguments = args
 
-  let outPipe = Pipe()
-  subProcess.standardOutput = outPipe
+    let outPipe = Pipe()
+    subProcess.standardOutput = outPipe
 
-  let errPipe = Pipe()
-  subProcess.standardError = errPipe
+    let errPipe = Pipe()
+    subProcess.standardError = errPipe
 
-  subProcess.launch()
+    subProcess.launch()
 
-  let outData = outPipe.fileHandleForReading.readDataToEndOfFile()
-  if var stringlized = String( data: outData, encoding: .utf8 ) {
-    stringlized = stringlized.trimmingCharacters( in: NSCharacterSet.newlines )
-    output = stringlized.components( separatedBy: "\n" )
+    let outData = outPipe.fileHandleForReading.readDataToEndOfFile()
+    if var stringlized = String( data: outData, encoding: .utf8 ) {
+      stringlized = stringlized.trimmingCharacters( in: NSCharacterSet.newlines )
+      output = stringlized.components( separatedBy: "\n" )
+      }
+
+    let errData = errPipe.fileHandleForReading.readDataToEndOfFile()
+    if var stringlized = String( data: errData, encoding: .utf8 ) {
+      stringlized = stringlized.trimmingCharacters( in: NSCharacterSet.newlines )
+      error = stringlized.components( separatedBy: "\n" )
+      }
+
+    if let terminationHandler = termination {
+      subProcess.terminationHandler = terminationHandler
+      }
+
+    subProcess.waitUntilExit()
+    return ( output, error, subProcess.terminationStatus )
     }
-
-  let errData = errPipe.fileHandleForReading.readDataToEndOfFile()
-  if var stringlized = String( data: errData, encoding: .utf8 ) {
-    stringlized = stringlized.trimmingCharacters( in: NSCharacterSet.newlines )
-    error = stringlized.components( separatedBy: "\n" )
-    }
-
-  if let terminationHandler = termination {
-    subProcess.terminationHandler = terminationHandler
-    }
-
-  subProcess.waitUntilExit()
-  return ( output, error, subProcess.terminationStatus )
   }
 
 //  MARK: Data
@@ -177,7 +179,7 @@ do {
       continue
       }
 
-    let ( output, error, status ) = run(
+    let ( output, error, status ) = Process.run(
         command: "/usr/bin/defaults"
       , withArguments: "read", updateItem.rawValue, updateItem.keyInDefaultsSystem 
       )
