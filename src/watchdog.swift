@@ -23,13 +23,13 @@
 //////////////////////////////////////////////////////////////////////
 
 //  watchdog.swift
-//  May 3, 2017, v0.1, torin@kwok
+//  May 3, 2017, v0.1, TorinKwok@GitHub
 //
 //  More of a learning experience than a useful product.
-//  Ported from a piece of Python script found here:
-//  <https://gist.github.com/5a3e7b3631b073db5529722f857f54aa.git> by Todd McDaniel (lazymutt@GitHub).
+//  Ported from a piece of Python script by Todd McDaniel (lazymutt@GitHub) 
+//  found here: <https://gist.github.com/5a3e7b3631b073db5529722f857f54aa.git> 
+//
 //  Thank you Todd!
-//  Parses update versions, some managed by `sudo softwareupdate --background-critical`
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -180,41 +180,45 @@ enum macOSCriticalUpdateItems: String, EnumCollection, CustomStringConvertible {
 //////////////////////////////////////////////////////////////////////
 
 do {
-  let outputPrinter = { ( _ tuple: ( first: String, second: Any, third: String )? ) in
-    guard let tuple = tuple else {
-      print( String( repeating: "-", count: 57 ) )      
-      return
+  typealias OutputPrinter = () -> ()
+
+  let assembledPrinter = { 
+    ( _ argsTuple: ( first: String, second: Any, third: String )? ) -> OutputPrinter in
+
+    guard let argsTuple = argsTuple else {
+      return { print( String( repeating: "-", count: 57 ) ) }
       }
 
     var dateString: String = ""
 
-    if let date = tuple.second as? Date {
-      let dateFormatter = DateFormatter()
+    if let date = argsTuple.second as? Date {
 
+      let dateFormatter = DateFormatter()
       dateFormatter.dateStyle = .medium
       dateFormatter.timeStyle = .short
 
       dateString = dateFormatter.string( from: date )
-      } else if let string = tuple.second as? String {
+
+      } else if let string = argsTuple.second as? String {
         dateString = string
         }
 
-    print(
-        tuple.first.padding( toLength: 24, withPad: " ", startingAt: 0 )
+    return { print(
+        argsTuple.first.padding( toLength: 24, withPad: " ", startingAt: 0 )
       , dateString.padding( toLength: 24, withPad: " ", startingAt: 0 )
-      , tuple.third.padding( toLength: 12, withPad: " ", startingAt: 0 )
-      )
+      , argsTuple.third.padding( toLength: 12, withPad: " ", startingAt: 0 )
+      ) }
     }
 
-  outputPrinter( ( first: "Name", second: "Date", third: "Version" ) )
-  outputPrinter( nil )
+  var outputPrinters: [ OutputPrinter ] = 
+    [ assembledPrinter( ( first: "Name", second: "Date", third: "Version" ) )
+    , assembledPrinter( nil )
+    ]
 
-  for updateItem in macOSCriticalUpdateItems.allAlternatives() {
-    guard updateItem.exists else {
-      continue
-      }
+  for updateItem in macOSCriticalUpdateItems.allAlternatives() 
+      where updateItem.exists {
 
-    let ( output, error, status ) = Process.run(
+    let ( output, error, _ ) = Process.run(
         command: "/usr/bin/defaults"
       , withArguments: "read", updateItem.rawValue, updateItem.keyInDefaultsSystem 
       )
@@ -222,11 +226,14 @@ do {
     if let version = output.first
       , let fileAttributes = try? FileManager.default.attributesOfItem( atPath: updateItem.rawValue )
       , let modDate = fileAttributes[ .modificationDate ] as? Date {
-      outputPrinter( 
+
+      outputPrinters.append( assembledPrinter( 
         ( first: String( describing: updateItem )
         , second: modDate
         , third: version 
-        ) )
+        ) ) )
       }
     }
+
+  outputPrinters.forEach { $0() }
   }
