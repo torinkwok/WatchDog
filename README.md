@@ -1,4 +1,4 @@
-# WatchDog [![travis-ci-status](https://travis-ci.org/TorinKwok/WatchDog.svg?branch=master)](https://travis-ci.org/TorinKwok/WatchDog) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](./LICENSE)
+# WatchDog [![travis-ci-status](https://travis-ci.org/TorinKwok/WatchDog.svg?branch=master)](https://travis-ci.org/TorinKwok/WatchDog) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](./LICENSE) [![release](https://img.shields.io/github/release/TorinKwok/WatchDog.svg)](https://github.com/TorinKwok/WatchDog/releases)
 
 ### What's this?
 
