@@ -1,6 +1,6 @@
 #!/usr/bin/swift
 
-// Copyright (c) 2017 Torin Kwok
+//  Copyright (c) 2017 Torin Kwok
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@
 //  watchdog.swift
 //  May 3, 2017, v0.1, TorinKwok@GitHub
 //
-//  More of a learning experience than a useful product.
 //  Ported from a piece of Python script by Todd McDaniel (lazymutt@GitHub) 
 //  found here: <https://gist.github.com/5a3e7b3631b073db5529722f857f54aa.git> 
 //

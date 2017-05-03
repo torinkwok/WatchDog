@@ -1,0 +1,3 @@
+language: objective-c
+script:
+  - ./src/watchdog.swift
