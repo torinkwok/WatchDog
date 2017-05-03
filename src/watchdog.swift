@@ -147,31 +147,31 @@ extension Process {
 //////////////////////////////////////////////////////////////////////
 
 /// A bunch of security update items we're going to examine.
-enum macOSCriticalUpdateItems: String, EnumCollection, CustomStringConvertible {
+enum macOSCriticalUpdateItems: String, EnumCollection {
 
-  case XProtect = "/System/Library/CoreServices/XProtect.bundle/Contents/Resources/XProtect.meta.plist"
-  case Gatekeeper = "/private/var/db/gkopaque.bundle/Contents/version.plist"
-  case SIP = "/System/Library/Sandbox/Compatibility.bundle/Contents/version.plist"
-  case MRT = "/System/Library/CoreServices/MRT.app/Contents/version.plist"
-  case CoreSuggestions = "/System/Library/Intelligent Suggestions/Assets.suggestionsassets/Contents/version.plist"
-  case IncompatibleKernelExt = "/System/Library/Extensions/AppleKextExcludeList.kext/Contents/version.plist"
-  case ChineseWordList = "/usr/share/mecabra/updates/com.apple.inputmethod.SCIM.bundle/Contents/version.plist"
-  case CoreLSDK = "/usr/share/kdrl.bundle/info.plist"
+  case XProtect = "XProtect"
+  case Gatekeeper = "Gatekeeper"
+  case SIP = "SIP"
+  case MRT = "MRT"
+  case CoreSuggestions = "Core Suggestions"
+  case IncompatibleKernelExt = "Incompatible Kernel Ext."
+  case ChineseWordList = "Chinese Word List"
+  case CoreLSDK = "Core LSKD (dkrl)"
 
-  var description: String {
+  var path: String {
     switch self {
-      case .XProtect             : return "XProtect"
-      case .Gatekeeper           : return "Gatekeeper"
-      case .SIP                  : return "SIP"
-      case .MRT                  : return "MRT"
-      case .CoreSuggestions      : return "Core Suggestions"
-      case .IncompatibleKernelExt: return "Incompatible Kernel Ext."
-      case .ChineseWordList      : return "Chinese Word List"
-      case .CoreLSDK             : return "Core LSKD (dkrl)"
+      case .XProtect             : return "/System/Library/CoreServices/XProtect.bundle/Contents/Resources/XProtect.meta.plist"
+      case .Gatekeeper           : return "/private/var/db/gkopaque.bundle/Contents/version.plist"
+      case .SIP                  : return "/System/Library/Sandbox/Compatibility.bundle/Contents/version.plist"
+      case .MRT                  : return "/System/Library/CoreServices/MRT.app/Contents/version.plist"
+      case .CoreSuggestions      : return "/System/Library/Intelligent Suggestions/Assets.suggestionsassets/Contents/version.plist"
+      case .IncompatibleKernelExt: return "/System/Library/Extensions/AppleKextExcludeList.kext/Contents/version.plist"
+      case .ChineseWordList      : return "/usr/share/mecabra/updates/com.apple.inputmethod.SCIM.bundle/Contents/version.plist"
+      case .CoreLSDK             : return "/usr/share/kdrl.bundle/info.plist"
       }
     }
 
-  var keyInDefaultsSystem: String {
+  var versionKeyInDefaultsSystem: String {
     switch self {
       case .XProtect: 
         return "Version"
@@ -185,7 +185,7 @@ enum macOSCriticalUpdateItems: String, EnumCollection, CustomStringConvertible {
     }
 
   var exists: Bool {
-    return FileManager.default.fileExists( atPath: self.rawValue )
+    return FileManager.default.fileExists( atPath: self.path )
     }
   }
 
@@ -234,15 +234,15 @@ do {
 
     let ( output, error, _ ) = Process.run(
         command: "/usr/bin/defaults"
-      , withArguments: "read", updateItem.rawValue, updateItem.keyInDefaultsSystem 
+      , withArguments: "read", updateItem.path, updateItem.versionKeyInDefaultsSystem 
       )
 
     if let version = output.first
-      , let fileAttributes = try? FileManager.default.attributesOfItem( atPath: updateItem.rawValue )
+      , let fileAttributes = try? FileManager.default.attributesOfItem( atPath: updateItem.path )
       , let modDate = fileAttributes[ .modificationDate ] as? Date {
 
       outputPrinters.append( assembledPrinter( 
-        ( first: String( describing: updateItem )
+        ( first: updateItem.rawValue
         , second: modDate
         , third: version 
         ) ) )
